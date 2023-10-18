@@ -63,19 +63,7 @@ const  useGodData = (dat, priv = 'default') =>{
         updateAll();
     }
 
-    const add = (key, value) =>{
-        let ok = false;
-        if((typeof goddata.private.data[priv] === "object" && goddata.private.data[priv] !== null) || Array.isArray(goddata.private.data[priv])){
-           ok = true;
-        }
-        if(!ok){
 
-            goddata.private.data[priv] = {};
-        }
-        goddata.private.data[priv][key] = value;
-
-        updateAll();
-    }
 
     const updateAll = () =>{
         goddata.private.instances = goddata.private.instances.filter((val)=>{
@@ -91,30 +79,10 @@ const  useGodData = (dat, priv = 'default') =>{
         })
     }
 
-    const getUserKey = (key) => {
-        if(goddata.private.data[priv] !== null && typeof goddata.private.data[priv][key] !== 'undefined'){
-            return goddata.private.data[priv][key];
-        } else {
-            return undefined;
-        }
-    }
 
-    const deleteKey = (key) => {
-        if(goddata.private.data[priv] !== null && typeof goddata.private.data[priv][key] !== 'undefined'){
 
-            if(Array.isArray(goddata.private.data[priv])){
-                goddata.private.data[priv].splice(key, 1);
-            } else {
-                delete goddata.private.data[priv][key];
-            }
-            updateAll();
-            return true;
 
-        } else {
-            return false;
-        }
-    }
-    return [goddata.private.data[priv], update, updateAll, getUserKey, add, deleteKey];
+    return [goddata.private.data[priv], update, updateAll];
 }
 
 
