@@ -50,7 +50,7 @@ const  useGodData = (dat) =>{
     }, []);
 
     const update = (data) =>{
-        useGodData.private.data = data;
+        goddata.private.data = data;
         updateAll();
     }
 
