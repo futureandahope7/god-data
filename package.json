@@ -1,0 +1,16 @@
+{
+  "name": "god-data",
+  "version": "1.0.0",
+  "author": "Robert Palmer <stuff@guardianonlinedevelopment.com.au>",
+  "description": "A hook to share global data between components.",
+  "main": "npm-init.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "global",
+    "data",
+    "share"
+  ],
+  "license": "MIT"
+}
