@@ -1,3 +1,3 @@
 import useGodData from "./useGodData";
 
-module.exports = useGodData;
+export default useGodData;
