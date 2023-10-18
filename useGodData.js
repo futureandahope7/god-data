@@ -114,7 +114,7 @@ const  useGodData = (dat, priv = 'default') =>{
             return false;
         }
     }
-    return [goddata.private.data[priv], update, getUserKey, add, deleteKey];
+    return [goddata.private.data[priv], update, updateAll, getUserKey, add, deleteKey];
 }
 
 
