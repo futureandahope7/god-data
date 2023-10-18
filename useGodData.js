@@ -2,14 +2,15 @@ import React, {useState, useEffect, useId} from 'react';
 
 
 
-const goddata = {private: {data: {}, instances:[], counter: 0}};
+const goddata = {private: {data: {default: {}}, instances:[], counter: 0}};
 
 
 
 
-const  useGodData = (dat) =>{
+const  useGodData = (dat, priv = 'default') =>{
 
     const [counter, setCounter] = useState(-1);
+
     const id = useId();
     const thisObject = this;
     const refresh = () =>{
@@ -25,9 +26,16 @@ const  useGodData = (dat) =>{
 
     if(counter === -1){
         goddata.private.instances.push({id: id, fn: refresh});
-        if(typeof dat !== 'undefined' && ((typeof dat === "object" && dat !== null) || Array.isArray(dat))) {
-            goddata.private.data = dat;
+        let area = 'default';
+        if(typeof priv === 'string'){
+            area = priv;
+        }
+        if(typeof dat !== 'undefined') {
 
+            goddata.private.data[area] = dat;
+
+        } else {
+            goddata.private.data[area] = {};
         }
     }
 
@@ -42,7 +50,8 @@ const  useGodData = (dat) =>{
     }
 
     useEffect(()=>{
-
+        
+        refresh();
         updateAll();
         return () => {
            cleanUp();
@@ -50,20 +59,20 @@ const  useGodData = (dat) =>{
     }, []);
 
     const update = (data) =>{
-        goddata.private.data = data;
+        goddata.private.data[priv] = data;
         updateAll();
     }
 
     const add = (key, value) =>{
         let ok = false;
-        if((typeof goddata.private.data === "object" && goddata.private.data !== null) || Array.isArray(goddata.private.data)){
+        if((typeof goddata.private.data[priv] === "object" && goddata.private.data[priv] !== null) || Array.isArray(goddata.private.data[priv])){
            ok = true;
         }
         if(!ok){
 
-            goddata.private.data = {};
+            goddata.private.data[priv] = {};
         }
-        goddata.private.data[key] = value;
+        goddata.private.data[priv][key] = value;
 
         updateAll();
     }
@@ -83,14 +92,29 @@ const  useGodData = (dat) =>{
     }
 
     const getUserKey = (key) => {
-        if(goddata.private.data !== null && typeof goddata.private.data[key] !== 'undefined'){
-            return goddata.private.data[key];
+        if(goddata.private.data[priv] !== null && typeof goddata.private.data[priv][key] !== 'undefined'){
+            return goddata.private.data[priv][key];
         } else {
-            return '';
+            return undefined;
         }
     }
 
-    return [goddata.private.data, update, getUserKey, add];
+    const deleteKey = (key) => {
+        if(goddata.private.data[priv] !== null && typeof goddata.private.data[priv][key] !== 'undefined'){
+
+            if(Array.isArray(goddata.private.data[priv])){
+                goddata.private.data[priv].splice(key, 1);
+            } else {
+                delete goddata.private.data[priv][key];
+            }
+            updateAll();
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+    return [goddata.private.data[priv], update, getUserKey, add, deleteKey];
 }
 
 
