@@ -34,7 +34,7 @@ const  useGodData = (dat, priv = 'default') =>{
 
             goddata.private.data[area] = dat;
 
-        } else {
+        } else if(typeof goddata.private.data[area] === 'undefined'){
             goddata.private.data[area] = {};
         }
     }
