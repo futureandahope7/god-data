@@ -76,7 +76,7 @@ const  useGodData = (dat, priv = 'default') =>{
         return () => {
             cleanUp();
         }
-    }, );
+    }, []);
 
 
 
