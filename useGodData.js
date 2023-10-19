@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 
 
 
-const goddata = {private: {areas: {}, data: {default: undefined}, instances:[], counter: 0}};
+const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0}};
 
 
 
@@ -24,7 +24,10 @@ const  useGodData = (dat, priv = 'default') =>{
     }
 
     if(counter === -1){
-        goddata.private.instances.push({id: id, fn: refresh});
+        if(typeof goddata.private.instances[priv] === 'undefined' ){
+            goddata.private.instances[priv] = [];
+        }
+        goddata.private.instances[priv].push({id: id, fn: refresh});
         let area = 'default';
         if(typeof priv === 'string'){
             area = priv;
@@ -41,28 +44,28 @@ const  useGodData = (dat, priv = 'default') =>{
     }
 
     const cleanUp = () =>{
-        let len = goddata.private.instances.length;
+        let len = goddata.private.instances[priv].length;
         for(let i = 0; i < len; i++){
-            if(goddata.private.instances[i]['id'] === id){
-                goddata.private.instances.splice(i, 1);
+            if(goddata.private.instances[priv][i]['id'] === id){
+                goddata.private.instances[priv].splice(i, 1);
                 break;
             }
         }
     }
 
     const updateRefresh = () =>{
-        let len = goddata.private.instances.length;
+        let len = goddata.private.instances[priv].length;
         let found = false;
         for(let i = 0; i < len; i++){
-            if(goddata.private.instances[i]['id'] === id){
-                goddata.private.instances[i]['id'] = id;
-                goddata.private.instances[i]['fn'] = refresh;
+            if(goddata.private.instances[priv][i]['id'] === id){
+                goddata.private.instances[priv][i]['id'] = id;
+                goddata.private.instances[priv][i]['fn'] = refresh;
                 found = true;
                 break;
             }
         }
         if(!found) {
-            goddata.private.instances.push({id: id, fn: refresh});
+            goddata.private.instances[priv].push({id: id, fn: refresh});
         }
     }
 
@@ -73,7 +76,7 @@ const  useGodData = (dat, priv = 'default') =>{
         return () => {
             cleanUp();
         }
-    }, []);
+    }, );
 
 
 
@@ -87,16 +90,18 @@ const  useGodData = (dat, priv = 'default') =>{
 
     const updateAll = () =>{
 
-        goddata.private.instances = goddata.private.instances.filter((val)=>{
+        goddata.private.instances[priv] = goddata.private.instances[priv].filter((val)=>{
             if(typeof val['fn'] === 'function'){
                 return true;
             }
             return false;
         });
-        goddata.private.instances.map((val)=>{
+        goddata.private.instances[priv].map((val)=>{
             if(typeof val['fn'] === 'function'){
                 val['fn']();
+                return true;
             }
+            return false;
         })
     }
 
