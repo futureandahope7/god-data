@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useId} from 'react';
+import React, {useState, useEffect} from 'react';
 
 
 
@@ -10,9 +10,8 @@ const goddata = {private: {areas: {}, data: {default: undefined}, instances:[], 
 const  useGodData = (dat, priv = 'default') =>{
 
     const [counter, setCounter] = useState(-1);
+    const [id] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
 
-    const id = useId();
-    const thisObject = this;
     const refresh = () =>{
         if(counter > 1000){
             goddata.private.counter = 0;
@@ -20,7 +19,7 @@ const  useGodData = (dat, priv = 'default') =>{
 
         } else {
             goddata.private.counter++;
-            setCounter((goddata.private.counter));
+            setCounter(Math.ceil(goddata.private.counter));
         }
     }
 
@@ -51,14 +50,32 @@ const  useGodData = (dat, priv = 'default') =>{
         }
     }
 
+    const updateRefresh = () =>{
+        let len = goddata.private.instances.length;
+        let found = false;
+        for(let i = 0; i < len; i++){
+            if(goddata.private.instances[i]['id'] === id){
+                goddata.private.instances[i]['id'] = id;
+                goddata.private.instances[i]['fn'] = refresh;
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            goddata.private.instances.push({id: id, fn: refresh});
+        }
+    }
+
     useEffect(()=>{
-        
+
         refresh();
         updateAll();
         return () => {
-           cleanUp();
+            cleanUp();
         }
     }, []);
+
+
 
     const update = (data) =>{
         goddata.private.data[priv] = data;
@@ -73,7 +90,7 @@ const  useGodData = (dat, priv = 'default') =>{
                 return true;
             }
             return false;
-        })
+        });
         goddata.private.instances.map((val)=>{
             if(typeof val['fn'] === 'function'){
                 val['fn']();
@@ -81,10 +98,10 @@ const  useGodData = (dat, priv = 'default') =>{
         })
     }
 
+    updateRefresh();
 
 
-
-    return [goddata.private.data[priv], update, updateAll];
+    return [goddata.private.data[priv], update, ()=> { return new Promise((resolve)=> { updateAll(); resolve() }); } ];
 }
 
 
