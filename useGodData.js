@@ -101,7 +101,7 @@ const  useGodData = (dat, priv = 'default') =>{
     updateRefresh();
 
 
-    return [goddata.private.data[priv], update, ()=> { return new Promise((resolve)=> { updateAll(); resolve() }); } ];
+    return [goddata.private.data[priv], update, updateAll];
 }
 
 
