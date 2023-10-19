@@ -12,6 +12,9 @@ const  useGodData = (dat, priv = 'default') =>{
     const [counter, setCounter] = useState(-1);
     const [id] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
 
+    if(typeof goddata.private.instances[priv] === 'undefined' ){
+        goddata.private.instances[priv] = [];
+    }
     const refresh = () =>{
         if(counter > 1000){
             goddata.private.counter = 0;
@@ -24,22 +27,16 @@ const  useGodData = (dat, priv = 'default') =>{
     }
 
     if(counter === -1){
-        if(typeof goddata.private.instances[priv] === 'undefined' ){
-            goddata.private.instances[priv] = [];
-        }
-        goddata.private.instances[priv].push({id: id, fn: refresh});
-        let area = 'default';
-        if(typeof priv === 'string'){
-            area = priv;
-        }
-        if(typeof dat !== 'undefined' && !(typeof goddata.private.areas[area] !== 'undefined' && goddata.private.areas[area] === true)) {
 
-            goddata.private.data[area] = dat;
-            goddata.private.areas[area] = true;
 
-        } else if(typeof goddata.private.data[area] === 'undefined'){
-            goddata.private.data[area] = undefined;
-            goddata.private.areas[area] = false;
+        if(typeof dat !== 'undefined' && !(typeof goddata.private.areas[priv] !== 'undefined' && goddata.private.areas[priv] === true)) {
+
+            goddata.private.data[priv] = dat;
+            goddata.private.areas[priv] = true;
+
+        } else if(typeof goddata.private.data[priv] === 'undefined'){
+            goddata.private.data[priv] = undefined;
+            goddata.private.areas[priv] = false;
         }
     }
 
@@ -106,7 +103,6 @@ const  useGodData = (dat, priv = 'default') =>{
     }
 
     updateRefresh();
-
 
     return [goddata.private.data[priv], update, updateAll];
 }
