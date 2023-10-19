@@ -79,12 +79,14 @@ const  useGodData = (dat, priv = 'default') =>{
 
     const update = (data) =>{
         goddata.private.data[priv] = data;
+        goddata.private.areas[priv] = true;
         updateAll();
     }
 
 
 
     const updateAll = () =>{
+
         goddata.private.instances = goddata.private.instances.filter((val)=>{
             if(typeof val['fn'] === 'function'){
                 return true;
