@@ -2,7 +2,7 @@ import React, {useState, useEffect, useId} from 'react';
 
 
 
-const goddata = {private: {data: {default: {}}, instances:[], counter: 0}};
+const goddata = {private: {areas: {}, data: {default: {}}, instances:[], counter: 0}};
 
 
 
@@ -30,12 +30,14 @@ const  useGodData = (dat, priv = 'default') =>{
         if(typeof priv === 'string'){
             area = priv;
         }
-        if(typeof dat !== 'undefined') {
+        if(typeof dat !== 'undefined' && !(typeof goddata.private.areas[area] !== 'undefined' && goddata.private.areas[area] === true)) {
 
             goddata.private.data[area] = dat;
+            goddata.private.areas[area] = true;
 
         } else if(typeof goddata.private.data[area] === 'undefined'){
             goddata.private.data[area] = {};
+            goddata.private.areas[area] = false;
         }
     }
 
