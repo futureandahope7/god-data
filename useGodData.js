@@ -21,7 +21,10 @@ const GodEndPrivateData = () => {
 
         goddata.private.privateDataId = ['default'];
     }
-    goddata.private.privateDataLast = goddata.private.privateDataId[goddata.private.privateDataId.length -1];
+
+    const [id] = useState(goddata.private.privateDataId[goddata.private.privateDataId.length -1]);
+
+    goddata.private.privateDataLast = id;
     return React.createElement(React.Fragment, {});
 }
 
