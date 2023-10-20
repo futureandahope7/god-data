@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 
 
@@ -10,7 +10,7 @@ export const GodPrivateData = ({children}) =>{
 
     goddata.private.privateDataId.push(id);
 
-    return <>{children}<GodEndPrivateData /></>
+    return React.createElement(React.Fragment, {}, children, React.createElement(GodEndPrivateData, {}));
 }
 
 const GodEndPrivateData = () => {
@@ -18,6 +18,7 @@ const GodEndPrivateData = () => {
     if(goddata.private.privateDataId.length == 0){
         goddata.private.privateDataId = ['default'];
     }
+    return React.createElement(React.Fragment, {});
 }
 
 const  useGodData = (dat, priv = 'default') =>{
