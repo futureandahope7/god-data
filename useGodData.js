@@ -16,12 +16,12 @@ export const GodPrivateData = ({children}) =>{
 
 const GodEndPrivateData = () => {
     goddata.private.privateDataId.pop();
-    goddata.private.privateDataLast = goddata.private.privateDataId[goddata.private.privateDataId.length -1];
 
     if(goddata.private.privateDataId.length == 0){
 
         goddata.private.privateDataId = ['default'];
     }
+    goddata.private.privateDataLast = goddata.private.privateDataId[goddata.private.privateDataId.length -1];
     return React.createElement(React.Fragment, {});
 }
 

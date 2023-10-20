@@ -1,6 +1,6 @@
 {
   "name": "god-data",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "author": "Robert Palmer <stuff@guardianonlinedevelopment.com.au>",
   "description": "A hook to share global data between components.",
   "main": "npm-init.js",
