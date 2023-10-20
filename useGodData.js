@@ -2,20 +2,24 @@ import React, {useState, useEffect} from 'react';
 
 
 
-const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default']}};
+const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default'],  privateDataLast: null}};
 
 
 export const GodPrivateData = ({children}) =>{
     const [id, setId] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
 
     goddata.private.privateDataId.push(id);
+    goddata.private.privateDataLast = id;
 
     return React.createElement(React.Fragment, {}, children, React.createElement(GodEndPrivateData, {}));
 }
 
 const GodEndPrivateData = () => {
     goddata.private.privateDataId.pop();
+    goddata.private.privateDataLast = goddata.private.privateDataId[goddata.private.privateDataId.length -1];
+
     if(goddata.private.privateDataId.length == 0){
+
         goddata.private.privateDataId = ['default'];
     }
     return React.createElement(React.Fragment, {});
@@ -25,9 +29,11 @@ const  useGodData = (dat, priv = 'default') =>{
 
     const [counter, setCounter] = useState(-1);
     const [id] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
-    const [pd] = useState(goddata.private.privateDataId[goddata.private.privateDataId.length -1] );
+    const [pd] = useState(goddata.private.privateDataLast  );
+    goddata.private.privateDataLast = pd;
 
     if(typeof goddata.private.instances[pd] === 'undefined'){
+
         goddata.private.instances[pd] = {};
     }
     if(typeof goddata.private.data[pd] === 'undefined'){
@@ -128,7 +134,6 @@ const  useGodData = (dat, priv = 'default') =>{
     }
 
     updateRefresh();
-
 
     return [goddata.private.data[pd][priv], update, updateAll];
 }
