@@ -2,12 +2,13 @@ import React, {useState, useEffect} from 'react';
 
 
 
-const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default'],  privateDataLast: 'default'}};
+const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default'],  privateDataLastId:['default'], privateDataLast: 'default'}};
 
 
 export const GodPrivateData = ({children}) =>{
     const [id, setId] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
 
+    goddata.private.privateDataLastId.push(goddata.private.privateDataLast);
     goddata.private.privateDataId.push(id);
     goddata.private.privateDataLast = id;
 
@@ -17,14 +18,16 @@ export const GodPrivateData = ({children}) =>{
 const GodEndPrivateData = () => {
     goddata.private.privateDataId.pop();
 
-    if(goddata.private.privateDataId.length == 0){
+    if(goddata.private.privateDataId.length === 0){
 
         goddata.private.privateDataId = ['default'];
     }
 
-    const [id] = useState(goddata.private.privateDataId[goddata.private.privateDataId.length -1]);
+    if(goddata.private.privateDataLastId.length === 0){
+        goddata.private.privateDataLastId = ['default', 'default'];
+    }
 
-    goddata.private.privateDataLast = id;
+    goddata.private.privateDataLast = goddata.private.privateDataLastId.pop();
     return React.createElement(React.Fragment, {});
 }
 
