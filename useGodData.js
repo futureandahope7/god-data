@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 
 
-const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default'],  privateDataLast: null}};
+const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, counter: 0, privateDataId: ['default'],  privateDataLast: 'default'}};
 
 
 export const GodPrivateData = ({children}) =>{
