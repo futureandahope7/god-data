@@ -1,3 +1,3 @@
-import useGodData from "./useGodData";
 
-export default useGodData;
+export useGodData, {GodPrivateData} from "./useGodData";
+
