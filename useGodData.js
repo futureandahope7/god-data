@@ -23,11 +23,13 @@ const GodEndPrivateData = () => {
         goddata.private.privateDataId = ['default'];
     }
 
+    goddata.private.privateDataLast = goddata.private.privateDataLastId.pop();
+
     if(goddata.private.privateDataLastId.length === 0){
-        goddata.private.privateDataLastId = ['default', 'default'];
+        goddata.private.privateDataLastId = ['default'];
     }
 
-    goddata.private.privateDataLast = goddata.private.privateDataLastId.pop();
+
     return React.createElement(React.Fragment, {});
 }
 
