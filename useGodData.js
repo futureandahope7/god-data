@@ -18,11 +18,22 @@ export const GodPrivateDataHelper = () => {
 
 export const GodPrivateData = ({children}) =>{
 
-
+if(goddata.private.privateDataLast === undefined){
+    goddata.private.privateDataLast = "default";
+}
 
     const [id, setId] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
     const [counter, setCounter] = useState(0);
 
+    if(goddata.private.rootNode === id){
+        goddata.private.privateDataLast = 'default';
+        goddata.private.privateDataLastId = ['default'];
+        console.log('IN IN GOD DATA STROE IN  (array of last id) ',goddata.private.privateDataLastId);
+        goddata.private.privateDataId = ['default'];
+
+
+
+    }
 
     const refresh = () =>{
         setCounter(goddata.private.privateDataTree[id]['counter']);
@@ -36,15 +47,21 @@ export const GodPrivateData = ({children}) =>{
 
         goddata.private.privateDataTree[id] = {counter: 0};
 
+
+
     }
 
-    if(goddata.private.privateDataLast !== 'default' || goddata.private.rootNode  === null) {
+    console.log('TESTITOUT HERE', goddata.private.privateDataLast, id, goddata)
+
+    if(goddata.private.privateDataLast !== 'default' || goddata.private.rootNode  === null || goddata.private.rootNode === id) {
+        if(goddata.private.privateDataLast !== id){
         goddata.private.privateDataTree[id]['parent'] = goddata.private.privateDataLast;
         let prev = goddata.private.privateRoughTree[goddata.private.privateDataLast];
         if (prev) {
 
-        prev.next[id] = goddata.private.privateDataTree[id];
-        goddata.private.privateRoughTree[id].previous = prev;
+            prev.next[id] = goddata.private.privateRoughTree[id];
+            goddata.private.privateRoughTree[id].previous = prev;
+        }
     }
 
     } else {
@@ -59,11 +76,33 @@ export const GodPrivateData = ({children}) =>{
         goddata.private.privateDataTree[id]['counter'] = 0;
     }
 
+    const recursiveDelete = (item) =>{
+
+
+        delete goddata.private.privateDataTree[item];
+        if(typeof goddata.private.privateRoughTree[item] !== 'undefined' && typeof goddata.private.privateRoughTree[item].next !== 'undefined') {
+            Object.keys(goddata.private.privateRoughTree[item].next).map((i) => {
+                recursiveDelete(i.id)
+            });
+        }
+        delete goddata.private.privateRoughTree[item];
+    }
+
     useEffect(()=>{
-        return ()=>{ delete goddata.private.privateDataTree[id]; }
+        return ()=>{
+            recursiveDelete(id);
+
+        }
     }, []);
 
+    if(goddata.private.rootNode === null){
+        goddata.private.rootNode = id;
+       
+    }
 
+    if(goddata.private.rootNode === id){
+
+    }
     /*console.log('last', goddata.private.privateDataLast, 'helper', helper)
     if(goddata.private.privateDataLast === 'default' && helper){
         goddata.private.privateDataLast = helper;
@@ -71,6 +110,7 @@ export const GodPrivateData = ({children}) =>{
     console.log('IN IN GOD DATA STROE (last ID start of IN IN) ---------------', goddata.private.privateDataLast, )
 
     goddata.private.privateDataLastId.push(goddata.private.privateDataLast);
+    let lastId = goddata.private.privateDataLast;
     console.log('IN IN GOD DATA STROE IN  (array of last id) ',goddata.private.privateDataLastId);
     goddata.private.privateDataId.push(id);
     goddata.private.privateDataLast = id;
@@ -78,11 +118,9 @@ export const GodPrivateData = ({children}) =>{
 
     console.log('IN IN GOD DATA STROE (id out) ---------------------', goddata.private.privateDataLast)
 
-    if(goddata.private.rootNode === null){
-        goddata.private.rootNode = id;
-    }
 
-    return React.createElement(React.Fragment, {}, children, React.createElement(GodEndPrivateData, {parentId: id, lastId: goddata.private.privateDataLast}));
+
+    return React.createElement(React.Fragment, {}, children, React.createElement(GodEndPrivateData, {parentId: id, lastId: lastId}));
 }
 
 const GodEndPrivateData = ({parentId, lastId}) => {
@@ -94,6 +132,7 @@ const GodEndPrivateData = ({parentId, lastId}) => {
     }
     console.log('IN IN GOD DATA STROE (last list OUT OUT ) BEFORE POP ===============',goddata.private.privateDataLastId);
     goddata.private.privateDataLast = goddata.private.privateDataLastId.pop();
+
     goddata.private.privateDataActualLast = goddata.private.privateDataLast;
     console.log('IN IN GOD DATA STROE (last list) AFTER POP ',goddata.private.privateDataLastId);
 
@@ -104,24 +143,36 @@ const GodEndPrivateData = ({parentId, lastId}) => {
     goddata.private.privateRoughTree[parentId].done = true;
 
     console.log('IN IN GOD DATA STROE (restored to) ====================', goddata.private.privateDataLast)
-
+    console.log('TESTITOUT HERE OUT OUT ====', goddata.private.privateDataLast, parentId, goddata)
 
     return React.createElement(React.Fragment, {});
 }
 
 const  useGodData = (dat, priv = 'default') =>{
 
+    if(typeof goddata.private.privateDataLast === 'undefined'){
+        goddata.private.privateDataLast = 'default';
+    }
+
+
     const [counter, setCounter] = useState(-1);
     const [id] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
     const [doo, setDoo] = useState(false);
     const [floating, setFloating] = useState(false);
-    const [pd, setPd] = useState(goddata.private.privateDataLast);
+    const [pd, setPd] = useState( goddata.private.privateDataLast);
     const [tempVal, setTempVal] = useState(undefined);
     const [refreshParents, setRefreshParents] = useState(false);
 console.log('god', pd, goddata.private.privateDataLast);
     const syncIssue = (pd !== goddata.private.privateDataLast) ? goddata.private.privateDataLast : false;
+    console.log('TESTITOUT sync',  pd, goddata.private.privateDataLast)
 
-    const getTree = () => {
+
+    console.log(pd , 'is')
+
+    const bad = (typeof goddata.private.privateRoughTree[pd] !== 'undefined' && typeof goddata.private.privateRoughTree[pd].next !== 'undefined' && (Object.keys(goddata.private.privateRoughTree[pd].next).map(()=>{ return true}).length > 0) || (goddata.private.privateRoughTree[pd].done && goddata.private.rootNode !== pd));
+  console.log('TESTITOUT bad', bad, goddata.private.privateRoughTree[pd], id)
+
+        const getTree = () => {
         if(goddata.private.privateDataTree[pd]['parent'] === false){
             goddata.private.privateDataTree[id][fn] = refresh;
         } else {
@@ -133,7 +184,22 @@ console.log('god', pd, goddata.private.privateDataLast);
 
 
     const searchBack = (privateID, level) => {
+
+            console.log('search back', goddata.private.privateRoughTree[privateID])
         let data= [];
+        if(typeof goddata.private.privateRoughTree[privateID] === 'undefined'){
+            return data;
+        }
+        if(goddata.private.privateRoughTree[privateID].previous === null){
+            return [goddata.private.privateRoughTree[privateID].id];
+        } else {
+            data = searchBack(goddata.private.privateRoughTree[privateID].previous.id, level+1);
+        return data.concat([goddata.private.privateRoughTree[privateID].id]);
+
+        }
+
+
+/*
         if(typeof goddata.private.privateRoughTree[privateID] === 'undefined' || goddata.private.privateRoughTree[privateID] === null || goddata.private.privateRoughTree[privateID].id === goddata.private.rootNode){
             if(goddata.private.privateRoughTree[privateID] === null || typeof goddata.private.privateRoughTree[privateID] === 'undefined'){
                 return [];
@@ -143,8 +209,8 @@ console.log('god', pd, goddata.private.privateDataLast);
         } else {
             data = searchBack(goddata.private.privateRoughTree[privateID].previous.id, level+1);
 
-            return data.concat([goddata.private.privateRoughTree[privateID].previous.id]);
-        }
+            return data.concat([goddata.private.privateRoughTree[privateID].id]);
+        } */
 
         /*if (goddata.private.privateRoughTree[privateID].previous === null && goddata.private.privateRoughTree[privateID].id !== goddata.private.rootNode) {
             setFloating(true);
@@ -184,12 +250,13 @@ console.log('god', pd, goddata.private.privateDataLast);
 
     useEffect(()=>{
         //on creating node children exist, this is a clear sign that we could be floating or adding in a new record
-        if(Object.keys(goddata.private.privateRoughTree[pd].next).map(()=>{ return true}).length > 0 || goddata.private.privateRoughTree[pd].done){
-            console.log('BAD BAD BAD init');
+        if(bad){
+            console.log('TESTITOUT BAD BAD BAD init');
             setFloating(true);
             setDoo(false);
+            setRefreshParents(true);
         } else {
-            console.log('GOOD GOOD GOO int');
+            console.log('TESTITOUT GOOD GOOD GOO int');
             setFloating(false);
             setDoo(true);
         }
@@ -197,11 +264,11 @@ console.log('god', pd, goddata.private.privateDataLast);
 
     useEffect(()=>{
         if(floating && (syncIssue !== false)){
-            console.log('jesus pickup', syncIssue)
+            console.log('TESTITOUT jesus pickup', syncIssue)
             setFloating(false);
             setPd(syncIssue);
             setDoo(true);
-            setRefreshParents(true);
+
         }
 
         if(typeof tempVal !== 'undefined' && doo){
@@ -213,11 +280,12 @@ console.log('god', pd, goddata.private.privateDataLast);
 
     useEffect(()=>{
         if(refreshParents){
-            const ids = searchBack();
-            console.log('teh big bad ids', ids);
+            const ids = searchBack(pd, 0);
+            console.log('TESTITOUT teh big bad ids', ids ,pd, id);
             for(let i = 0; i < ids.length; i++){
                 goddata.private.privateDataTree[ids[i]]['fn']();
             }
+            setRefreshParents(false);
         }
     }, [refreshParents])
 
