@@ -11,3 +11,41 @@ For instructions on how to use and install refer to our [god-data Wiki Page](htt
 
 
 
+Below is an example of the functions usage:
+
+
+```    
+    import useGodData, {GodPrivateData} from 'god-data'
+    
+    const AComponent = () => {
+        const [data, setData, updateAll] = useGodData({name: 'Robert', age: 48}, 'a-unique-key-to-link-data');
+
+        
+
+        return <>{typeof data['name'] !== 'undefined' ? data['name] + ' ' + data['age']: ''}</>;
+    
+    }
+
+
+    const BComponent = () => {
+        const [data, setData, updateAll] = useGodData(undefined, 'a-unique-key-to-link-data');
+
+        useEffect(()=> {
+        
+            //replace all data in object
+            setData({name: 'Allan', age: 46});
+        
+        }, []);
+
+        return <></>;
+    }
+
+    const Main = () => {
+
+     return <><AComponent /><Bcomponent /></>;
+
+    }
+```
+
+
+Main above will return <><>Allan 46</><></></>
