@@ -10,34 +10,73 @@ class TreeLeaf  {
     }
 }
 
-export const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, rootNode: null, privateRoughTree: {}, privateDataTree:{}, counter: 0, privateDataActualLast: 'default', privateDataAsync: {}, privateDataId: ['default'],  privateDataLastId:['default'], privateDataLast: 'default'}};
+const goddata = {private: {areas: {}, data: {default: undefined}, instances: {}, rootNode: null, privateDataRefresh: {}, privateDataKnownAs: {}, privateRoughTree: {}, privateDataTree:{}, counter: 0, isNew: false, privateDataActualLast: 'default', privateDataAsync: {}, privateDataId: ['default'],  privateDataLastId:['default'], privateDataLast: 'default'}};
 
-export const GodPrivateDataHelper = () => {
-    return useState(goddata.private.privateDataLast)[0];
-}
+export const GodPrivateData = ({children}) => {
 
-export const GodPrivateData = ({children}) =>{
-
-if(goddata.private.privateDataLast === undefined){
-    goddata.private.privateDataLast = "default";
-}
+    //const [knowsAs, setKnownAs] = useState({});
 
     const [id, setId] = useState(Date.now().toString(36) + Math.random().toString(36).substring(2));
     const [counter, setCounter] = useState(0);
+    const refresh = () =>{
+        console.log('FLOATING = refresh Private DAta', id)
+        setCounter(counter + 1);
+    }
+
+    useEffect(()=>{
+
+        if (typeof goddata.private.privateDataKnownAs[id] !== 'undefined') {
+
+        } else {
+            goddata.private.privateDataKnownAs[id] = {};
+        }
+        goddata.private.privateDataKnownAs[id][id + '_' + goddata.private.privateDataLast] = goddata.private.privateDataLast;
+
+
+        goddata.private.privateDataRefresh[id] = refresh;
+
+
+        /*
+        if(typeof goddata.private.privateDataKnownAs[goddata.private.privateDataLast] === 'undefined' && (typeof goddata.private.privateDataKnownAs[goddata.private.privateDataLast] !== 'undefined' && typeof goddata.private.privateDataKnownAs[goddata.private.privateDataLast][id+goddata.private.privateDataLast] === 'undefined')) {
+
+            let temp = {...knowsAs};
+            temp[goddata.private.privateDataLast] = refresh;
+
+            for (let i in temp) {
+                if (temp.hasOwnProperty(i)) {
+                    temp[i] = refresh;
+                    if (typeof goddata.private.privateDataKnownAs[i] !== 'undefined') {
+
+                    } else {
+                        goddata.private.privateDataKnownAs[i] = {};
+                    }
+                    goddata.private.privateDataKnownAs[i][id + i] = refresh;
+                }
+            }
+
+            setKnownAs(temp);
+        }
+        */
+
+    });
+
+    console.log('FLOATING = Private DAta do', id)
+
+    return React.createElement(React.Fragment, {}, React.createElement(GodDataHead, {id: id, lastId: goddata.private.privateDataLast, refresh: refresh}), children, React.createElement(GodEndPrivateData, {parentId: id, lastId: goddata.private.privateDataLast}));
+}
+
+const GodDataHead = ({id,lastId, refresh}) => {
+
+    goddata.private.privateDataLast = lastId;
 
     if(goddata.private.rootNode === id){
         goddata.private.privateDataLast = 'default';
         goddata.private.privateDataLastId = ['default'];
-        console.log('IN IN GOD DATA STROE IN  (array of last id) ',goddata.private.privateDataLastId);
         goddata.private.privateDataId = ['default'];
 
-
-
     }
 
-    const refresh = () =>{
-        setCounter(goddata.private.privateDataTree[id]['counter']);
-    }
+
 
 
     if(typeof goddata.private.privateDataTree[id] === 'undefined'){
@@ -55,14 +94,14 @@ if(goddata.private.privateDataLast === undefined){
 
     if(goddata.private.privateDataLast !== 'default' || goddata.private.rootNode  === null || goddata.private.rootNode === id) {
         if(goddata.private.privateDataLast !== id){
-        goddata.private.privateDataTree[id]['parent'] = goddata.private.privateDataLast;
-        let prev = goddata.private.privateRoughTree[goddata.private.privateDataLast];
-        if (prev) {
+            goddata.private.privateDataTree[id]['parent'] = goddata.private.privateDataLast;
+            let prev = goddata.private.privateRoughTree[goddata.private.privateDataLast];
+            if (prev) {
 
-            prev.next[id] = goddata.private.privateRoughTree[id];
-            goddata.private.privateRoughTree[id].previous = prev;
+                prev.next[id] = goddata.private.privateRoughTree[id];
+                goddata.private.privateRoughTree[id].previous = prev;
+            }
         }
-    }
 
     } else {
         goddata.private.privateDataTree[id]['parent'] = false;
@@ -78,7 +117,6 @@ if(goddata.private.privateDataLast === undefined){
 
     const recursiveDelete = (item) =>{
 
-
         delete goddata.private.privateDataTree[item];
         if(typeof goddata.private.privateRoughTree[item] !== 'undefined' && typeof goddata.private.privateRoughTree[item].next !== 'undefined') {
             Object.keys(goddata.private.privateRoughTree[item].next).map((i) => {
@@ -91,26 +129,20 @@ if(goddata.private.privateDataLast === undefined){
     useEffect(()=>{
         return ()=>{
             recursiveDelete(id);
-
         }
     }, []);
 
     if(goddata.private.rootNode === null){
         goddata.private.rootNode = id;
-       
     }
 
     if(goddata.private.rootNode === id){
 
     }
-    /*console.log('last', goddata.private.privateDataLast, 'helper', helper)
-    if(goddata.private.privateDataLast === 'default' && helper){
-        goddata.private.privateDataLast = helper;
-    }*/
+
     console.log('IN IN GOD DATA STROE (last ID start of IN IN) ---------------', goddata.private.privateDataLast, )
 
     goddata.private.privateDataLastId.push(goddata.private.privateDataLast);
-    let lastId = goddata.private.privateDataLast;
     console.log('IN IN GOD DATA STROE IN  (array of last id) ',goddata.private.privateDataLastId);
     goddata.private.privateDataId.push(id);
     goddata.private.privateDataLast = id;
@@ -118,12 +150,15 @@ if(goddata.private.privateDataLast === undefined){
 
     console.log('IN IN GOD DATA STROE (id out) ---------------------', goddata.private.privateDataLast)
 
+    return React.createElement(React.Fragment, {});
 
-
-    return React.createElement(React.Fragment, {}, children, React.createElement(GodEndPrivateData, {parentId: id, lastId: lastId}));
 }
 
 const GodEndPrivateData = ({parentId, lastId}) => {
+
+
+
+
     goddata.private.privateDataId.pop();
 
     if(goddata.private.privateDataId.length === 0){
@@ -145,6 +180,8 @@ const GodEndPrivateData = ({parentId, lastId}) => {
     console.log('IN IN GOD DATA STROE (restored to) ====================', goddata.private.privateDataLast)
     console.log('TESTITOUT HERE OUT OUT ====', goddata.private.privateDataLast, parentId, goddata)
 
+
+
     return React.createElement(React.Fragment, {});
 }
 
@@ -162,30 +199,27 @@ const  useGodData = (dat, priv = 'default') =>{
     const [pd, setPd] = useState( goddata.private.privateDataLast);
     const [tempVal, setTempVal] = useState(undefined);
     const [refreshParents, setRefreshParents] = useState(false);
-console.log('god', pd, goddata.private.privateDataLast);
+    const [doingRefresh, setDoingRefresh] = useState(false);
+    const [siblings, setSiblings] = useState();
+
     const syncIssue = (pd !== goddata.private.privateDataLast) ? goddata.private.privateDataLast : false;
-    console.log('TESTITOUT sync',  pd, goddata.private.privateDataLast)
-
-
-    console.log(pd , 'is')
-
-    const bad = (typeof goddata.private.privateRoughTree[pd] !== 'undefined' && typeof goddata.private.privateRoughTree[pd].next !== 'undefined' && (Object.keys(goddata.private.privateRoughTree[pd].next).map(()=>{ return true}).length > 0) || (goddata.private.privateRoughTree[pd].done && goddata.private.rootNode !== pd));
+    const lastId = goddata.private.privateDataLast;
+    const bad = (pd === 'default' || (typeof goddata.private.privateRoughTree[pd] !== 'undefined' && typeof goddata.private.privateRoughTree[pd].next !== 'undefined' && (Object.keys(goddata.private.privateRoughTree[pd].next).map(()=>{ return true}).length > 0) || (goddata.private.privateRoughTree[pd].done && goddata.private.rootNode !== pd)));
   console.log('TESTITOUT bad', bad, goddata.private.privateRoughTree[pd], id)
 
-        const getTree = () => {
-        if(goddata.private.privateDataTree[pd]['parent'] === false){
-            goddata.private.privateDataTree[id][fn] = refresh;
-        } else {
 
-        }
-
-        goddata.private.privateDataTree[id][counter]++;
-    }
+    console.log('FLOATING = id:', id, 'doo', doo, 'floating:', floating, 'pd', pd, 'last', goddata.private.privateDataLast, 'tempVal', tempVal, 'refreshParents', refreshParents, 'syncIssue', syncIssue, 'bad', bad);
 
 
     const searchBack = (privateID, level) => {
 
-            console.log('search back', goddata.private.privateRoughTree[privateID])
+        if(floating){
+            console.log(id, "FLOATING = searchBack")
+        }
+
+
+
+      console.log('back is', goddata.private.privateRoughTree[privateID])
         let data= [];
         if(typeof goddata.private.privateRoughTree[privateID] === 'undefined'){
             return data;
@@ -198,46 +232,15 @@ console.log('god', pd, goddata.private.privateDataLast);
 
         }
 
-
-/*
-        if(typeof goddata.private.privateRoughTree[privateID] === 'undefined' || goddata.private.privateRoughTree[privateID] === null || goddata.private.privateRoughTree[privateID].id === goddata.private.rootNode){
-            if(goddata.private.privateRoughTree[privateID] === null || typeof goddata.private.privateRoughTree[privateID] === 'undefined'){
-                return [];
-            }
-            return [goddata.private.privateRoughTree[privateID].id];
-
-        } else {
-            data = searchBack(goddata.private.privateRoughTree[privateID].previous.id, level+1);
-
-            return data.concat([goddata.private.privateRoughTree[privateID].id]);
-        } */
-
-        /*if (goddata.private.privateRoughTree[privateID].previous === null && goddata.private.privateRoughTree[privateID].id !== goddata.private.rootNode) {
-            setFloating(true);
-            return false;
-        } else if(goddata.private.privateRoughTree[privateID].previous === null && goddata.private.privateRoughTree[privateID].id === goddata.private.rootNode){
-            setFloating(false);
-        }*/
-
-
-
-
-
-
     }
 
-    /*const searchTree = (privateID) =>{
-        let found = false;
-        goddata.private.privateRoughTree[privateID].next.each((TreeLeaf)=>{
 
-            if(TreeLeaf.id === pd){
-                found = true;
-            }
-
-            searchTree()
-        })
-    }*/
     const refresh = () =>{
+
+        if(floating){
+            console.log(id, "FLOATING = refrsh")
+        }
+
         if(counter > 1000){
             goddata.private.counter = 0;
             setCounter(0);
@@ -249,6 +252,9 @@ console.log('god', pd, goddata.private.privateDataLast);
     }
 
     useEffect(()=>{
+
+            console.log(id, "FLOATING create object (ignore)", )
+
         //on creating node children exist, this is a clear sign that we could be floating or adding in a new record
         if(bad){
             console.log('TESTITOUT BAD BAD BAD init');
@@ -263,118 +269,68 @@ console.log('god', pd, goddata.private.privateDataLast);
     },[]);
 
     useEffect(()=>{
+
+        if(floating){
+            console.log(id, "FLOATING = useEffect [each]", goddata.private.data[pd][priv])
+        }
+
         if(floating && (syncIssue !== false)){
-            console.log('TESTITOUT jesus pickup', syncIssue)
+            console.log('FLOATING = ', pd , 'RESTORED TO:  ', syncIssue)
             setFloating(false);
             setPd(syncIssue);
             setDoo(true);
 
         }
 
-        if(typeof tempVal !== 'undefined' && doo){
-            update(tempVal);
-            setTempVal(undefined);
-        }
-    })
-    //const [pd, setPd] = useState(goddata.private.privateDataLast  );
+
+
+
+    });
 
     useEffect(()=>{
+
+        if(floating){
+            console.log(id, "FLOATING = useEffect [refreshParents]")
+        }
+
         if(refreshParents){
-            const ids = searchBack(pd, 0);
+            console.log('FLOATING = THE ARRAY known as', goddata.private.privateDataKnownAs, 'using ', pd)
+            if(typeof goddata.private.privateDataKnownAs[pd] !== 'undefined'){
+                //goddata.private.privateDataKnownAs[i][id+i]
+                console.log('FLOATING = log', goddata.private.privateDataKnownAs[pd]);
+
+                for(let i in goddata.private.privateDataKnownAs[pd]){
+                    if(goddata.private.privateDataKnownAs[pd].hasOwnProperty(i)){
+                        if(typeof goddata.private.privateDataRefresh[goddata.private.privateDataKnownAs[pd][i]] === 'function') {
+                            goddata.private.privateDataRefresh[goddata.private.privateDataKnownAs[pd][i]]();
+                        }
+                    }
+                }
+            }
+
+            /*const ids = searchBack(pd, 0);
             console.log('TESTITOUT teh big bad ids', ids ,pd, id);
+            console.log(id, "FLOATING = data from refresh", ids );
             for(let i = 0; i < ids.length; i++){
                 goddata.private.privateDataTree[ids[i]]['fn']();
             }
+            console.log('FLOATING = data tree', goddata.private.privateDataTree, goddata.private.privateRoughTree)
+            if(ids.indexOf(lastId) === -1 && typeof goddata.private.privateDataTree[lastId] !== 'undefined'){
+                goddata.private.privateDataTree[lastId]['fn']();
+            }
             setRefreshParents(false);
+            setDoingRefresh(true); */
+
+
         }
-    }, [refreshParents])
+    }, [refreshParents]);
 
 
-    /*if(pd !== goddata.private.privateDataLast && (pd === goddata.private.privateDataActualLast) || (pd !== goddata.private.privateDataActualLast && goddata.private.privateDataLastId.length === 1)){
-         goddata.private.privateDataAsync[id] = goddata.private.privateDataLast;
-        console.log('Preparing ASYNC pd:', pd, 'LAST: ', goddata.private.privateDataAsync[id], 'ID OF OBJECT', id, 'ACTUAL LAST:', goddata.private.privateDataActualLast)
-
-    }*/
 
 
     goddata.private.privateDataLast = pd;
 
-    /*
-    useEffect(()=>{
-
-
-        //this detects async functions and fixes them.
-
-       if(typeof goddata.private.privateDataAsync[id] !== 'undefined'){
-           if(pd  !== goddata.private.privateDataAsync[id]){
-
-               console.log('FIXING ASYNC pd:', pd, 'LAST: ', goddata.private.privateDataAsync[id], 'ID OF OBJECT', id, 'ACTUAL LAST:', goddata.private.privateDataActualLast)
-
-               let temp = goddata.private.privateDataAsync[id];
-
-               let len = goddata.private.instances[pd][priv].length;
-               for(let i = 0; i < len; i++){
-                   if(goddata.private.instances[pd][priv][i]['id'] === id){
-                       goddata.private.instances[pd][priv].splice(i, 1);
-                       break;
-                   }
-               }
-               if(typeof goddata.private.data[temp] === 'undefined'){
-                   goddata.private.data[temp] = {};
-               }
-               if(typeof goddata.private.areas[temp] === 'undefined'){
-                   goddata.private.areas[temp] = {};
-               }
-               goddata.private.data[temp][priv] = goddata.private.data[pd][priv];
-               goddata.private.areas[temp][priv] = goddata.private.areas[pd][priv];
-               if(goddata.private.instances[pd][priv].length === 0){
-                   delete goddata.private.data[pd][priv];
-               }
-               delete goddata.private.privateDataAsync[id];
-               setPd(goddata.private.privateDataLast);
-           }
-       }
-
-    }); */
-
-    /*if(typeof goddata.private.privatePDs[id] !== 'undefined'){
-        if(goddata.private.privatePDs[id]  !== goddata.private.privateDataLast){
-            pd = goddata.private.privatePDs[id];
-            let temp = goddata.private.privateDataLast
-
-            let len = goddata.private.instances[pd][priv].length;
-            for(let i = 0; i < len; i++){
-                if(goddata.private.instances[pd][priv][i]['id'] === id){
-                    goddata.private.instances[pd][priv].splice(i, 1);
-                    break;
-                }
-            }
-            if(typeof goddata.private.data[temp] === 'undefined'){
-                goddata.private.data[temp] = {};
-            }
-            if(typeof goddata.private.areas[temp] === 'undefined'){
-                goddata.private.areas[temp] = {};
-            }
-            goddata.private.data[temp][priv] = goddata.private.data[pd][priv];
-            goddata.private.areas[temp][priv] = goddata.private.areas[pd][priv];
-            if(goddata.private.instances[pd][priv].length === 0){
-                delete goddata.private.data[pd][priv];
-            }
-
-            goddata.private.privatePDs[id] = goddata.private.privateDataLast;
-        }
-    } else {
-        goddata.private.privatePDs[id] = goddata.private.privateDataLast;
-    }
-
-    pd = goddata.private.privateDataLast; */
-
-
-
-
-
-
-   if(doo) {
+    if(doo) {
 
        if (typeof goddata.private.instances[pd] === 'undefined') {
 
@@ -413,6 +369,10 @@ console.log('god', pd, goddata.private.privateDataLast);
 
     const cleanUp = () =>{
 
+        if(floating){
+            console.log(id, "FLOATING = cleanUP")
+        }
+
        if(typeof goddata.private.instances[pd] === 'undefined'){
            return false;
        }
@@ -427,6 +387,10 @@ console.log('god', pd, goddata.private.privateDataLast);
     }
 
     const updateRefresh = () =>{
+
+        if(floating){
+            console.log(id, "FLOATING = updateRefresh")
+        }
 
         let len = goddata.private.instances[pd][priv].length;
         let found = false;
@@ -445,29 +409,49 @@ console.log('god', pd, goddata.private.privateDataLast);
 
     useEffect(()=>{
 
+        if(floating){
+            console.log(id, "FLOATING = useEffcet - cleanUp, []")
+        }
+
         return () => {
             cleanUp();
         }
     }, []);
 
     useEffect(()=>{
+
+        if(floating){
+            console.log(id, "FLOATING = useEffect [doo]")
+        }
+
         if(doo){
-            refresh();
-            updateAll();
+            console.log('set to do', goddata);
+            if(typeof tempVal !== 'undefined'){
+                update(tempVal);
+                setTempVal(undefined);
+            } else {
+                refresh();
+                updateAll();
+
+            }
         }
     }, [doo])
 
-
-
     const update = (data) =>{
+        if(floating){
+            console.log(id, "FLOATING = update")
+        }
+        console.log('created', goddata)
         goddata.private.data[pd][priv] = data;
         goddata.private.areas[pd][priv] = true;
         updateAll();
     }
 
+    const updateAll = () => {
 
-
-    const updateAll = () =>{
+        if(floating){
+            console.log(id, "FLOATING = updateAll")
+        }
 
         goddata.private.instances[pd][priv] = goddata.private.instances[pd][priv].filter((val)=>{
             if(typeof val['fn'] === 'function'){
@@ -484,13 +468,21 @@ console.log('god', pd, goddata.private.privateDataLast);
         })
     }
 
-    console.log('GOD GLOBAL', goddata.private);
-
     if(!doo){
-        return [undefined, (val)=>{ setTempVal(val); }, updateAll]
+        if(floating){
+            console.log(id, "FLOATING = return [undefined]")
+        }
+        return [undefined, (val)=>{
+            setTempVal(val);
+            console.log('not created', goddata);
+            }, updateAll];
     }
 
     updateRefresh();
+
+    if(floating){
+        console.log(id, "FLOATING = return [data]")
+    }
 
     return [goddata.private.data[pd][priv], update, updateAll];
 }
